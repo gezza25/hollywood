@@ -1,0 +1,102 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="klientai-view">
+    <template>
+      <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "kodas":"{numberLength|8}}", "fname":"{firstName}", "lname":"{lastName}"}'
+        handle-as="json"
+        last-response="{{KlientaiResponse}}"></iron-ajax>
+      <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "dateFrom":"{date|2010-10-10, 2011-10-10}", "dateTo":"{date|2016-10-10, 2017-01-01}", "kodas":"{numberLength|8}}", "filmoPavadinimas":"{lorem}", "kaina":"{randomDecimal}"}'
+        handle-as="json"
+        last-response="{{NuomosSutartysResponse}}"></iron-ajax>
+      <style include="shared-styles">
+        :host {
+          display: block;
+
+          padding: 10px;
+        }
+      </style>
+
+    <div class="card">
+      <div class="circle">3</div>
+      <h1>Klientai</h1>
+      <button onclick="kCreateRow()">+</button>
+      <table id="kTable">
+        <thead>
+          <tr>
+            <th id="kKodas">Kodas</th>
+            <th id="kVardas">Vardas</th>
+            <th id="kPavarde">Pavardė</th>
+          </tr>
+        </thead>
+        <template is="dom-repeat" items={{KlientaiResponse}}>
+          <tr>
+            <td>{{item.kodas}}</td>
+            <td>{{item.fname}}</td>
+            <td>{{item.lname}}</td>
+          </tr>
+        </template>
+    </table>
+
+    <h1>Nuomos sutartys</h1>
+    <table id="nsTable">
+        <thead>
+            <tr>
+                <th id="nsPasirasyta">Pasirašyta</th>
+                <th id="nsGrazinta">Gražinta</th>
+                <th id="nsKodas">Kodas</th>
+                <th id="nsVaizdoIrasas">Vaizdo įrašas</th>
+                <th id="nsKaina">Kaina</th>
+            </tr>
+        </thead>
+        <template is="dom-repeat" items={{NuomosSutartysResponse}}>
+          <tr>
+            <td>{{item.dateFrom}}</td>
+            <td>{{item.dateTo}}</td>
+            <td>{{item.kodas}}</td>
+            <td>{{item.filmoPavadinimas}}</td>
+            <td>{{item.kaina}}</td>
+          </tr>
+        </template>
+    </table>
+    </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'klientai-view'
+        });
+
+        function kCreateRow() {
+            var table = document.getElementById("kTable");
+            var row = table.insertRow(1);
+            var colCount = table.rows[0].cells.length;
+            console.log(colCount);
+            for (var i = 0; i < colCount; i++) {
+                var cell = row.insertCell(i);
+                var element = document.createElement("input");
+                element.type = "text";
+                element.name = "txtbox[]";
+                element.placeholder = table.rows[0].cells[i].innerHTML;
+                cell.appendChild(element);
+            }
+        }
+    </script>
+</dom-module>

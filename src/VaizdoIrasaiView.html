@@ -1,0 +1,121 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="vaizdo-irasai-view">
+    <template>
+
+      <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "pavadinimas":"{business}", "kodas":"{numberLength|8}}"}'
+        handle-as="json"
+
+        last-response="{{VaizdoIrasaiResponse}}"></iron-ajax>
+
+      <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "pavadinimas":"{business}", "kodas":"{numberLength|8}}"}'
+        handle-as="json"
+        last-response="{{VaizdoIrasaiKopijosResponse}}"></iron-ajax>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      textarea {
+        width: 100%;
+        height: 60px;
+        padding: 6px 10px;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f8f8;
+        font-size: 16px;
+        resize: none;
+      }
+    </style>
+
+    <div class="card">
+      <div class="circle">2</div>
+      <h1>Vaizdo įrašai</h1>
+      <button onclick="viCreateRow()">+</button>
+      <table id="viTable">
+        <thead>
+          <tr>
+            <th id="vi-1">Kodas</th>
+            <th id="vi-2">Pavadinimas</th>
+          </tr>
+        </thead>
+        <template is="dom-repeat" items={{VaizdoIrasaiResponse}}>
+          <tr>
+            <td>{{item.kodas}}</td>
+            <td>{{item.pavadinimas}}</td>
+          </tr>
+        </template>
+    <tr>
+        <td colspan="2">
+            <legend>Trumpas aprasymas</legend>
+            <textarea></textarea>
+        </td>
+    </tr>
+    </table>
+
+    <h1>Vaizdo įrašų kopijos</h1>
+    <table id="vikTable">
+        <thead>
+            <tr>
+                <th id="vik-1">Kodas</th>
+                <th id="vik-2">Pavadinimas</th>
+                <th id="vik-3">Būklė</th>
+                <th id="vik-4">Įsigyta</th>
+                <th id="vik-5">Sunaikinta</th>
+                <th id="vik-6">Tiekėjas</th>
+            </tr>
+        </thead>
+        <template is="dom-repeat" items={{VaizdoIrasaiKopijosResponse}}>
+          <tr>
+            <td>{{item.kodas}}</td>
+            <td>{{item.pavadinimas}}</td>
+            <td>{{item.bukle}}</td>
+            <td>{{item.isigyta}}</td>
+            <td>{{item.sunaikinta}}</td>
+            <td>{{item.tiekejas}}</td>
+          </tr>
+        </template>
+    </table>
+    </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'vaizdo-irasai-view'
+        });
+
+        function viCreateRow() {
+            var table = document.getElementById("viTable");
+            var row = table.insertRow(1);
+            var colCount = table.rows[0].cells.length;
+            console.log(colCount);
+            for (var i = 0; i < colCount; i++) {
+                var cell = row.insertCell(i);
+                var element = document.createElement("input");
+                element.type = "text";
+                element.name = "txtbox[]";
+                element.placeholder = table.rows[0].cells[i].innerHTML;
+                cell.appendChild(element);
+            }
+        }
+    </script>
+</dom-module>

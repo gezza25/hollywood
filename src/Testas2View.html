@@ -1,0 +1,115 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="/src/TiekejaiAjax.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="testas-view2">
+    <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <hwmtie-Ajax-service-get atsakymas="{{atsakymas}}" first="{{first}}" metodas="GET"></hwmtie-Ajax-service-get>
+    <div class="card">
+        <div class="circle">5</div>
+        <div>
+            <button on-tap="tNewRow" id="button1">+</button>
+        </div>
+        <div id="newRow" style="display: none" fullbleed layout horizontal>
+            <hwmtie-Ajax-service-post></hwmtie-Ajax-service-post>
+            <!--<input-element2 naujas-Tiekejas="{{Signup}}"></input-element2>-->
+            <!--<paper-button raised on-tap="show">+</paper-button>-->
+        </div>
+    <vaadin-grid selection-mode="single">
+        <table id="table">
+            <col name="pavadinimas">
+            <col name="email">
+            <col name="phone">
+            <col name="fname">
+            <col name="lname">
+            <col name="kopijuSkaicius">
+            <thead>
+                <tr>
+                    <th id="tiek-1">Pavadinimas</th>
+                    <th id="tiek-2">El. Pašto Adresas</th>
+                    <th id="tiek-3">Telefonas</th>
+                    <th id="tiek-4">Atstovo vardas</th>
+                    <th id="tiek-5">Atstovo pavardė</th>
+                    <th id="tiek-6">Kopijų skaičius</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template is="dom-repeat" items={{atsakymas}}>
+                    <tr>
+                        <td>{{item.tie_pavadinimas}}</td>
+                        <td>{{item.tie_el_pasto_adresas}}</td>
+                        <td>{{item.tie_telefonas}}</td>
+                        <td>{{item.tie_atstovo_vardas}}</td>
+                        <td>{{item.tie_atstovo_pavarde}}</td>
+                        <td>{{item.tie_kopiju_skaicius}}</td>
+                    </tr>
+                </template>
+    </tbody>
+    </table>
+    </vaadin-grid>
+    <a href="{{first}}" target="_blank">Suformuotą JSON galima rasti čia</a>
+    <!--</template>-->
+    </div>
+
+    </template>
+    <script>
+        window.addEventListener('WebComponentsReady', function(e) {
+            // imports are loaded and elements have been registered
+            console.log('Components are ready');
+        });
+        Polymer({
+            is: 'testas-view2',
+            properties: {
+                naujasTiekejas: {
+                    type: Array,
+                    readOnly: false
+                }
+            },           
+            tNewRow: function() {
+                var elem = document.getElementById('button1').innerText;
+                if (elem == "+")
+                    document.getElementById('button1').innerText = '-',
+                    document.getElementById("newRow").style.display = "inline";
+                else
+                    document.getElementById('button1').innerText = '+',
+                    document.getElementById("newRow").style.display = "none";
+            },
+            observers: [
+                "SignupChanged(Signup)"
+            ],
+            SignupChanged: function() {
+                console.log('testas-view2 - changedChanged');
+            },
+            show: function() {
+                console.log(this.naujasTiekejas.pavadinimas);
+                /*
+                var Signup = this.Signup;
+                this.Signup = {};
+                this.Signup = Signup;
+                alert(Signup.pavadinimas);
+                */
+            }
+        });
+    </script>
+</dom-module>

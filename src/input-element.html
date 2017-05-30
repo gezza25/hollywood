@@ -1,0 +1,51 @@
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="input-element">
+    <template>
+        <!--<template is="dom-bind" id="app">-->
+            <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+            </style>
+            <paper-input value="{{pavadinimas}}" label="Pavadinimas"></paper-input>
+            <paper-input value="{{email}}" label="El. Pašto Adresas"></paper-input>
+            <paper-input value="{{phone}}" label="Telefonas"></paper-input>
+            <paper-input value="{{fname}}" label="Atstovo vardas"></paper-input>
+            <paper-input value="{{lname}}" label="Atstovo pavardė"></paper-input>
+            <paper-input value="{{kopijuSkaicius}}" label="Kopijų skaičius"></paper-input>
+            <paper-button raised on-tap="signUp">+</paper-button>
+        <!--</template>-->
+    </template>
+    <script>
+        Polymer({
+            is: 'input-element',
+            properties: {
+                Signup: {
+                    type: Array,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            },
+            ready: function() {
+                this.pavadinimas = "World";
+                //console.log('Array = ' + this.newSignup);
+            },
+            signUp: function() {
+                this.set();
+                Signup.pavadinimas = "{{pavadinimas}}";
+                alert(Signup.pavadinimas);
+                //this.newSignup = e.Signup;
+                //alert(2);
+
+                //this.$.app
+                //var appp = this.$$(appsss);
+                //newSignup.push(newSignup);
+            }
+        });
+    </script>
+</dom-module>

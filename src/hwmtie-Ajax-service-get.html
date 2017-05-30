@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="hwmtie-Ajax-service-get">
+    <!--
+    <template>
+        <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "pavadinimas":"{business}", "email":"{email}", "phone":"{phone}", "fname":"{firstName}", "lname":"{lastName}", "kopijuSkaicius":"{number}"}'
+        handle-as="json"
+        on-response="tiekejaiLoaded"></iron-ajax>
+    </template>
+    -->
+    <template>
+        <iron-ajax
+        auto
+        method = "GET"
+        url="http://192.168.14.242:8080/ords/hw/api/hwmtie_tie"
+        handle-as="json"
+        on-response="atsakymasLoaded"></iron-ajax>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: "hwmtie-Ajax-service-get",
+        properties: {
+            atsakymas: {
+                type: Array,
+                notify: true
+            },
+            first: {
+                type: String,
+                notify: true
+            }
+        },
+        attached: function() {
+            this.atsakymas = [];
+        },
+        atsakymasLoaded: function(data) {
+            this.atsakymas = data.detail.response.items;
+            data = JSON.parse(JSON.stringify(data.detail.response.first));
+            arr = []
+            for (var event in data) {
+                var dataCopy = data[event]
+                this.first = dataCopy;
+                //console.log(this.first);
+                //alert(dataCopy);
+                /*
+                for (key in dataCopy) {
+                    if (key == "start" || key == "end") {
+                        // needs more specific method to manipulate date to your needs
+                        dataCopy[key] = new Date(dataCopy[key])
+                    }
+                }
+*/
+                arr.push(dataCopy)
+            }
+        }
+    });
+</script>

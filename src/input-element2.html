@@ -1,0 +1,162 @@
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="input-element2">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: flex;
+            padding: 10px;
+        }
+        #container {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            margin: 10px;
+            margin-bottom: 15px;
+            height: 50px;
+        }
+        </style>
+        
+        <div id="container">
+            <paper-input value="{{pavadinimas}}" label="Pavadinimas"></paper-input>
+            <paper-input value="{{email}}" label="El. Pašto Adresas"></paper-input>
+            <paper-input value="{{phone}}" label="Telefonas"></paper-input>
+            <paper-input value="{{fname}}" label="Atstovo vardas"></paper-input>
+            <paper-input value="{{lname}}" label="Atstovo pavardė"></paper-input>
+            <paper-input value="{{kopijuSkaicius}}" label="Kopijų skaičius" auto-validate pattern="[1-9][0-9]*" required error-message="Įveskite skaičių"></paper-input>
+        </div>
+        <paper-button raised on-tap="tapSignUp">+</paper-button>
+        <iron-ajax 
+            id="dataAjax" 
+            method=""
+            url=""
+            on-response="postComplete">
+        </iron-ajax>
+    </template>
+    <script>
+        Polymer({
+            is: 'input-element2',
+            /*
+            properties: {
+                Signup: {
+                    type: Array,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            },
+            observers: [
+                "SignupChanged(Signup)"
+            ],
+            "SignupChanged": function() {
+                console.log("changed in input-element2:", this.pavadinimas);
+
+                console.log("changed in input-element2:", this.phone);
+                console.log("changed in input-element2:", this.kopijuSkaicius);
+            },
+            attached: function() {
+                this.Signup = [];
+            },
+            */
+            postComplete: function(data) {
+                alert('whoa! request complete');
+            },
+            tapSignUp: function() {
+                /*
+                                this.Signup.pavadinimas = this.pavadinimas;
+                                this.Signup.email = this.email;
+                                this.Signup.phone = this.phone;
+                                this.Signup.fname = this.fname;
+                                this.Signup.lname = this.lname;
+                                this.Signup.kopijuSkaicius = this.kopijuSkaicius;
+                */
+                var jsonMessage = JSON.stringify({
+                    //"tie_date_created": "2016-12-08T10:58:13Z",
+                    //"tie_user_created": 241,
+                    //"tie_date_modified": "2016-12-08T10:59:51Z",
+                    //"tie_user_modified": 241,
+                    //"tie_number_of_times_modified": 3,
+                    "tie_pavadinimas": this.pavadinimas,
+                    "tie_el_pasto_adresas": this.email,
+                    "tie_telefonas": this.phone,
+                    "tie_atstovo_vardas": this.fname,
+                    "tie_atstovo_pavarde": this.lname,
+                    "tie_kopiju_skaicius": this.kopijuSkaicius
+                        //"tie_user_defined_property_0": null,
+                        //"tie_user_defined_property_1": null,
+                        //"tie_user_defined_property_2": null,
+                        //"tie_user_defined_property_3": null,
+                        //"tie_user_defined_property_4": null,
+                        //"tie_user_defined_property_5": null,
+                        //"tie_user_defined_property_6": null,
+                        //"tie_user_defined_property_7": null,
+                        //"tie_user_defined_property_8": null,
+                        //"tie_user_defined_property_9": null
+                });
+                console.log("jsonMessage :" + jsonMessage);
+
+                this.$.dataAjax.url = "http://jsonplaceholder.typicode.com/posts";
+                this.$.dataAjax.method = "POST";
+                this.$.dataAjax.body = jsonMessage;
+                this.$.dataAjax.generateRequest();
+
+                /*
+                                var t = document.querySelector('t');
+                                var ajaxRequest = t.$.dataAjax;
+
+                                // make the iron-ajax call
+                                t.postData = function() {
+                                    ajaxRequest.body = jsonarray;
+                                    ajaxRequest.generateRequest();
+                                };
+
+                                //callback on request complete
+                                t.postComplete = function() {
+                                    alert('whoa! request complete');
+                                };
+                */
+
+                //console.log("Pavadinimas įvestas :" + this.Signup.pavadinimas);
+                //console.log("phone įvestas :" + this.Signup.phone);
+                //console.log("kopijuSkaicius įvestas :" + this.Signup.kopijuSkaicius);
+
+                /*
+                console.log("Masyvo reset:");
+                var SignupNew = this.Signup;
+                console.log("Iki reset:" + this.pavadinimas);
+                this.Signup = {};
+                this.Signup = SignupNew;
+                console.log("Po reset1:" + SignupNew.pavadinimas);
+                console.log("Po reset2:" + this.pavadinimas);
+                */
+
+
+                //              this.notifyPath('Signup');
+
+            }
+        });
+        /*
+                (function(document) {
+                    'use strict';
+                    document.addEventListener('WebComponentsReady', function() {
+
+                        // We have to bind the template with the model
+                        var t = document.querySelector('t');
+                        var ajaxRequest = t.$.dataAjax;
+
+                        // make the iron-ajax call
+                        t.postData = function() {
+                            ajaxRequest.body = jsonarray;
+                            ajaxRequest.generateRequest();
+                        }
+
+                        //callback on request complete
+                        t.postComplete = function() {
+                            alert('whoa! request complete');
+                        }
+                    });
+                })(document);
+        */
+    </script>
+</dom-module>

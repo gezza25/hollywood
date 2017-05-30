@@ -1,0 +1,59 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<!--<link rel="import" href="https://cdn.vaadin.com/vaadin-elements/latest/vaadin-grid/vaadin-grid.html">-->
+
+<dom-module id="testas-view">
+    <template>
+    <div>
+      <h1>Polymer Basic Property Observers</h1>
+      <p>{{title}}</p>
+    <div>
+  </template>
+
+    <script type="text/javascript">
+        class BasicObserver {
+            beforeRegister() {
+                this.is = 'testas-view',
+                    this.properties = {
+                        count: {
+                            type: Number,
+                            default: 0,
+                            observer: '_countChanged'
+                        }
+                    };
+            }
+            _countChanged(newVal, oldVal) {
+                this.title = `Property 'count' changed
+         from ${oldVal || 0} 
+         to ${newVal}`;
+            }
+        }
+
+        // update the count property every second...
+        var count = 0;
+        setInterval(() => {
+            const el = document.querySelector('testas-view');
+            el.count = (++count);
+        }, 1000);
+        /*
+                Polymer({
+                    is: 'testas-view',
+                });
+        */
+        HTMLImports.whenReady(function() {
+            console.log("BasicObserver function");
+            Polymer(BasicObserver);
+        });
+    </script>
+</dom-module>

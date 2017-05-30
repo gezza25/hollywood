@@ -1,0 +1,30 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="tiekejai-ajax-service">
+    <template>
+        <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "pavadinimas":"{business}", "email":"{email}", "phone":"{phone}", "fname":"{firstName}", "lname":"{lastName}", "kopijuSkaicius":"{number}"}'
+        handle-as="json"
+        on-response="tiekejaiLoaded"></iron-ajax>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: "tiekejai-ajax-service",
+        properties: {
+            tiekejai: {
+                type: Array,
+                notify: true
+            }
+        },
+        attached: function() {
+            this.tiekejai = [];
+        },
+        tiekejaiLoaded: function(data) {
+            this.tiekejai = data.detail.response;
+        }
+    });
+</script>

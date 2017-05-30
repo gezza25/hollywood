@@ -1,0 +1,392 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="/src/TiekejaiAjax.html">
+<link rel="import" href="shared-styles.html">
+
+
+<dom-module id="tiekejai-view">
+    <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      #NewItem {
+        height: 100%;
+        width: 100%;
+        display: none;
+        margin: 10px;
+        margin-bottom: 15px;
+        height: 50px;
+      }
+      #bottomMenu {
+        height: 100%;
+        width: 100%;
+        display: none;
+        margin: 10px;
+        margin-bottom: 15px;
+        height: 50px;
+      }
+      #bNewItemCreate {
+        display: none;
+      }
+      #bNewItemUpdate {
+        display: none;
+      }
+      #bFirstBatch {
+        display: none;
+      }
+      #bPrevBatch {
+        display: none;
+      }
+      #bNextBatch {
+        display: none;
+      }
+    </style>
+    <iron-ajax
+        id="dataAjax"
+        on-response="postComplete"
+        on-error="postError">
+    </iron-ajax>
+
+    <div class="card">
+        <div class="circle">1</div>
+        <h1>Tiekėjai</h1>
+        <div>
+            <button on-tap="bRefresh">Refresh</button>
+            <button on-tap="bSearch">Search</button>
+            <button id='bCreate' on-tap="bCreate">Add new</button>
+            <button id='bUpdate' on-tap="bUpdate">Update</button>
+            <button id='bDelete' on-tap="bDelete">Delete selected</button>
+        </div>
+        <div id="NewItem">
+            <paper-input value="{{pavadinimas}}" label="Pavadinimas"></paper-input>
+            <paper-input value="{{email}}" label="El. Pašto Adresas"></paper-input>
+            <paper-input value="{{phone}}" label="Telefonas"></paper-input>
+            <paper-input value="{{fname}}" label="Atstovo vardas"></paper-input>
+            <paper-input value="{{lname}}" label="Atstovo pavardė"></paper-input>
+            <paper-input value="{{kopijuSkaicius}}" label="Kopijų skaičius" auto-validate pattern="[1-9][0-9]*" required error-message="Įveskite skaičių"></paper-input>
+            <paper-button id="bNewItemCreate" raised on-tap="tapCreate">Create</paper-button>
+            <paper-button id="bNewItemUpdate" raised on-tap="tapUpdate">Update</paper-button>
+        </div>
+
+        <vaadin-grid selection-mode="single">
+        <table id="table">
+            <col name="pavadinimas">
+            <col name="email">
+            <col name="phone">
+            <col name="fname">
+            <col name="lname">
+            <col name="kopijuSkaicius">
+            <thead>
+                <tr>
+                    <th id="tiek-1">Pavadinimas</th>
+                    <th id="tiek-2">El. Pašto Adresas</th>
+                    <th id="tiek-3">Telefonas</th>
+                    <th id="tiek-4">Atstovo vardas</th>
+                    <th id="tiek-5">Atstovo pavardė</th>
+                    <th id="tiek-6">Kopijų skaičius</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template id="resultList" is="dom-repeat" items={{atsakymas}}>
+                    <tr>
+                        <td>{{item.tie_pavadinimas}}</td>
+                        <td>{{item.tie_el_pasto_adresas}}</td>
+                        <td>{{item.tie_telefonas}}</td>
+                        <td>{{item.tie_atstovo_vardas}}</td>
+                        <td>{{item.tie_atstovo_pavarde}}</td>
+                        <td>{{item.tie_kopiju_skaicius}}</td>
+                    </tr>
+            </template>
+    </tbody>
+    </table>
+    </vaadin-grid>
+    <div id="bottomMenu">
+        <paper-button id="bFirstBatch" raised on-tap="tapFirstBatch">First</paper-button>
+        <paper-button id="bPrevBatch" raised on-tap="tapPrevBatch">Prev</paper-button>
+        <paper-button id="bNextBatch" raised on-tap="tapNextBatch">Next</paper-button>
+    </div>
+
+    </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tiekejai-view',
+            listeners: {
+                'bCreate.tap': 'bCreateTap',
+                'bUpdate.tap': 'bUpdateTap',
+                'bDelete.tap': 'bDelete'
+            },
+            bCreateTap: function() {
+                alert("Paspaudėte ant 'Create'");
+            },
+            bUpdateTap: function() {
+                alert("Paspaudėte ant 'Update'");
+            },
+            atsakymas: {
+                type: Array
+            },
+            first: {
+                type: String
+            },
+            next: {
+                type: String
+            },
+            prev: {
+                type: String
+            },
+            /*
+                        ready: function() {
+                            console.log('tiekejai-view: ready iskviesta start');
+                            this.$.dataAjax.url = "http://192.168.14.242:8080/ords/hw/api/hwmtie_tie";
+                            this.$.dataAjax.method = "GET";
+                            //this.$.onresponse = "postComplete";
+                            this.$.dataAjax.generateRequest();
+                            console.log('tiekejai-view: ready iskviesta end');
+                        },
+            */
+            /*
+                        attached: function() {
+                            var grid = document.querySelector("vaadin-grid");
+                            grid.addEventListener('selected-items-changed', function() {
+                                console.log('Selected: ' + grid.selection.selected());
+                            });
+                        },
+            */
+            bRefresh: function() {
+                console.log('tiekejai-view: ready iskviesta bRefresh start');
+                this.$.bCreate.innerText = 'Add new';
+                this.$.bUpdate.innerText = 'Update';
+                this.$.dataAjax.url = "http://192.168.14.242:8080/ords/hw/api/hwmtie_tie/";
+                this.$.dataAjax.method = "GET";
+                this.$.dataAjax.generateRequest();
+                console.log('tiekejai-view: ready iskviesta bRefresh end');
+            },
+            bDelete: function() {
+                console.log('tiekejai-view: ready iskviesta bDelete start');
+                var grid = document.querySelector("vaadin-grid");
+                var selectedItem = grid.selection.selected();
+                if (selectedItem != "") {
+                    var an = confirm("Tikrai norite ištrinti įrašą pavadinimu '" + this.atsakymas[selectedItem].tie_pavadinimas + "'?");
+                    if (an == true) {
+                        var jsonMessage = JSON.stringify({
+                            "tie_id": this.atsakymas[grid.selection.selected()].tie_id
+                        });
+                        console.log(jsonMessage);
+                        this.$.dataAjax.url = "http://192.168.14.242:8080/ords/hw/api/hwmtie_tie/";
+                        this.$.dataAjax.method = "DELETE";
+                        this.$.dataAjax.contentType = "application/json"
+                        this.$.dataAjax.body = jsonMessage;
+                        this.$.dataAjax.generateRequest();
+                        grid.refreshItems();
+                    }
+                } else {
+                    alert("Pasirinkite įrašą");
+                }
+                console.log('tiekejai-view: ready iskviesta bDelete end');
+            },
+            bCreate: function() {
+                //var elem = document.getElementById('bCreate').innerText;
+                var elem = this.$.bCreate.innerText;
+                if (elem == "Add new") {
+                    this.$.bCreate.innerText = 'Hide';
+                    //document.getElementById('bCreate').innerText = 'Hide';
+                    document.getElementById("NewItem").style.display = "flex";
+                    document.getElementById("bNewItemCreate").style.display = "flex"
+                } else {
+                    this.$.bCreate.innerText = 'Add new';
+                    document.getElementById('bCreate').innerText = 'Add new';
+                    document.getElementById("NewItem").style.display = "none";
+                    document.getElementById("NewItem").reset();
+                    document.getElementById("bNewItemCreate").style.display = "none"
+                };
+            },
+            bUpdate: function() {
+                var grid = document.querySelector("vaadin-grid");
+                var selectedItem = grid.selection.selected();
+                if (selectedItem != "") {
+
+                    this.id = this.atsakymas[selectedItem].tie_id;
+                    this.notm = this.atsakymas[selectedItem].tie_number_of_times_modified;
+                    this.pavadinimas = this.atsakymas[selectedItem].tie_pavadinimas;
+                    this.email = this.atsakymas[selectedItem].tie_el_pasto_adresas;
+                    this.phone = this.atsakymas[selectedItem].tie_telefonas;
+                    this.fname = this.atsakymas[selectedItem].tie_atstovo_vardas;
+                    this.lname = this.atsakymas[selectedItem].tie_atstovo_pavarde;
+                    this.kopijuSkaicius = this.atsakymas[selectedItem].tie_kopiju_skaicius;
+                    var elem = document.getElementById('bUpdate').innerText;
+                    if (elem == "Update") {
+                        document.getElementById('bUpdate').innerText = 'Hide';
+                        document.getElementById("NewItem").style.display = "flex";
+                        document.getElementById("bNewItemUpdate").style.display = "flex";
+                        this.$.NewItem.style.reset();
+                    } else {
+                        document.getElementById('bUpdate').innerText = 'Update';
+                        document.getElementById("NewItem").style.display = "none";
+                        document.getElementById("bNewItemUpdate").style.display = "none";
+                        this.$.NewItem.style.reset();
+                    };
+                } else {
+                    alert("Pasirinkite įrašą");
+                };
+
+            },
+            tapCreate: function() {
+                var jsonMessage = JSON.stringify({
+                    "tie_pavadinimas": this.pavadinimas,
+                    "tie_el_pasto_adresas": this.email,
+                    "tie_telefonas": this.phone,
+                    "tie_atstovo_vardas": this.fname,
+                    "tie_atstovo_pavarde": this.lname,
+                    "tie_kopiju_skaicius": this.kopijuSkaicius
+                });
+
+                console.log("jsonMessage :" + jsonMessage);
+                this.$.dataAjax.url = "http://192.168.14.242:8080/ords/hw/api/hwmtie_tie/";
+                this.$.dataAjax.method = "POST";
+                this.$.dataAjax.contentType = "application/json";
+                this.$.dataAjax.body = jsonMessage;
+                if (this.pavadinimas == "") {
+                    alert('Neivestas Pavadinimas');
+                } else {
+                    //alert('Siunciama info');
+                    this.$.dataAjax.generateRequest();
+                }
+                this.$.NewItem.style.display = "none";
+                this.$.NewItem.style.reset();
+                this.$.bCreate.innerText = 'Add new';
+                this.$.bUpdate.innerText = 'Update';
+            },
+            tapFirstBatch: function() {
+                console.log("tapFirstBatch start");
+                console.log(this.first.$ref);
+                this.$.dataAjax.url = this.first.$ref;
+                this.$.dataAjax.method = "GET";
+                this.$.dataAjax.generateRequest();
+                console.log("tapFirstBatch end");
+            },
+            tapPrevBatch: function() {
+                console.log("tapPrevBatch start");
+                console.log(this.prev.$ref);
+                this.$.dataAjax.url = this.prev.$ref;
+                this.$.dataAjax.method = "GET";
+                this.$.dataAjax.generateRequest();
+                console.log("tapPrevBatch end");
+            },
+            tapNextBatch: function() {
+                console.log("tapNextBatch start");
+                console.log(this.next.$ref);
+                this.$.dataAjax.url = this.next.$ref;
+                this.$.dataAjax.method = "GET";
+                this.$.dataAjax.generateRequest();
+                console.log("tapNextBatch end");
+            },
+            tapUpdate: function() {
+                var jsonMessage = JSON.stringify({
+                    "tie_date_created": "2016-12-08T10:58:13Z",
+                    "tie_user_created": 241,
+                    "tie_date_modified": "2016-12-08T10:58:13Z",
+                    "tie_user_modified": 241,
+                    "tie_number_of_times_modified": this.notm + 1,
+                    "tie_id": this.id,
+                    "tie_pavadinimas": this.pavadinimas,
+                    "tie_el_pasto_adresas": this.email,
+                    "tie_telefonas": this.phone,
+                    "tie_atstovo_vardas": this.fname,
+                    "tie_atstovo_pavarde": this.lname,
+                    "tie_kopiju_skaicius": this.kopijuSkaicius
+                });
+
+                console.log("jsonMessage :" + jsonMessage);
+                this.$.dataAjax.url = "http://192.168.14.242:8080/ords/hw/api/hwmtie_tie/";
+                this.$.dataAjax.method = "PUT";
+                this.$.dataAjax.contentType = "application/json"
+                this.$.dataAjax.body = jsonMessage;
+                if (this.pavadinimas == "") {
+                    alert('Neivestas Pavadinimas');
+                } else {
+                    alert('Siunciama info');
+                    this.$.dataAjax.generateRequest();
+                };
+                //var elem = document.getElementById('bUpdate').innerText;
+                this.$.NewItem.style.display = "none";
+                this.$.NewItem.style.reset();
+                //document.getElementById("NewItem").style.display = "none";
+                this.$.bCreate.innerText = 'Add new';
+                this.$.bUpdate.innerText = 'Update';
+
+                //document.getElementById('bUpdate').innerText = 'Update';
+            },
+            postComplete: function(data) {
+                console.log('tiekejai-view: atsakymasLoaded iskviesta postComplete start');
+                if (data.detail.response != null) {
+                    if (data.detail.response.items != null) {
+                        console.log("response start");
+                        this.atsakymas = data.detail.response.items;
+                        console.log("response end");
+                    };
+                    if (data.detail.response.first != null) {
+                        console.log("first start");
+                        console.log(data.detail.response.first);
+                        this.first = data.detail.response.first;
+                        this.$.bFirstBatch.style.display = "flex";
+                        console.log("first end");
+                    } else {
+                        this.$.bFirstBatch.style.display = "none";
+                    };
+                    if (data.detail.response.next != null) {
+                        console.log("next start");
+                        console.log(data.detail.response.next);
+                        this.next = data.detail.response.next;
+                        this.$.bNextBatch.style.display = "flex";
+                        console.log("next end");
+                    } else {
+                        this.$.bNextBatch.style.display = "none";
+                    };
+                    if (data.detail.response.prev != null) {
+                        console.log("prev start");
+                        console.log(data.detail.response.prev);
+                        this.prev = data.detail.response.prev;
+                        this.$.bPrevBatch.style.display = "flex";
+                        console.log("prev end");
+                    } else {
+                        this.$.bPrevBatch.style.display = "none";
+                    };
+                    if (data.detail.response.items != null || this.first != null || data.detail.response.next != null || data.detail.response.prev != null) {
+                        this.$.bottomMenu.style.display = "flex";
+                    } else {
+                        this.$.bottomMenu.style.display = "none";
+                    };
+
+                    this.$.resultList.render();
+                }
+                console.log('tiekejai-view: atsakymasLoaded iskviesta postComplete end');
+            },
+            postError: function(data) {
+                alert('Error!');
+                //console.log(data);
+                //console.log(data.detail);
+                console.log(data.detail.error);
+                console.log(data.detail.error.message);
+                console.log(data.detail.request.xhr.response);
+                //console.log(data.detail.request);
+                //console.log(data.detail.response);
+                //console.log(data.detail.request.response);
+            },
+        });
+    </script>
+</dom-module>

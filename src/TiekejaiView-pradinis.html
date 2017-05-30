@@ -1,0 +1,192 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="/src/TiekejaiAjax.html">
+<link rel="import" href="shared-styles.html">
+
+
+<dom-module id="tiekejai-view">
+    <template>
+<!--
+      <iron-ajax
+        auto
+        url="http://www.filltext.com/"
+        params='{"rows":"5", "pavadinimas":"{business}", "email":"{email}", "phone":"{phone}", "fname":"{firstName}", "lname":"{lastName}", "kopijuSkaicius":"{number}"}'
+        handle-as="json"
+        last-response="{{TiekejaiResponse}}"></iron-ajax>
+-->
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+
+    <tiekejai-ajax-service tiekejai="{{tiekejai}}"></tiekejai-ajax-service>
+    <div class="card">
+        <div class="circle">1</div>
+        <h1>Tiekėjai</h1>
+        <!--
+      <button type="button"
+        var table_content = "document.getElementById('table')";
+        onclick="addField(this)">
+        Naujas tiekėjas</button>
+-->
+        <button on-tap="tCreateRow">+</button>
+        <button on-tap="handleTap">Press</button>
+        <!--<button type="button" onclick="document.getElementById('demo').innerHTML = Date()">Click me to display Date and Time.</button>-->
+        <!--<input type="button" value="Add" border="1px" onclick="addRow()" /><br/><br/>-->
+
+    <vaadin-grid selection-mode="single">
+        <table id="table">
+            <!-- Define the columns and their mapping to data properties. -->
+
+            <col name="pavadinimas">
+            <col name="email">
+            <col name="phone">
+            <col name="fname">
+            <col name="lname">
+            <col name="kopijuSkaicius">
+
+            <!-- Define the column headings. -->
+            <thead>
+                <tr>
+                    <th id="tiek-1">Pavadinimas</th>
+                    <th id="tiek-2">El. Pašto Adresas</th>
+                    <th id="tiek-3">Telefonas</th>
+                    <th id="tiek-4">Atstovo vardas</th>
+                    <th id="tiek-5">Atstovo pavardė</th>
+                    <th id="tiek-6">Kopijų skaičius</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template is="dom-repeat" items={{tiekejai}}>
+                    <tr>
+                        <td>{{item.pavadinimas}}</td>
+                        <td>{{item.email}}</td>
+                        <td>{{item.phone}}</td>
+                        <td>{{item.fname}}</td>
+                        <td>{{item.lname}}</td>
+                        <td>{{item.kopijuSkaicius}}</td>
+                    </tr>
+            </template>
+    </tbody>
+    </table>
+    </vaadin-grid>
+    <div id="detalizacija"></div>
+    </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'tiekejai-view',
+            tiekejai: [],
+            handleTap: function() {
+                var grid = grid || document.querySelector('vaadin-grid');
+                var selected = grid.selection.selected();
+                alert('Selected: ' + selected);
+                var divTest = document.getElementById("detalizacija").innerHTML = selected;
+            },
+            tCreateRow: function() {
+                console.log('tCreateRow');
+                var table = document.getElementById("table");
+                console.log('table');
+                var row = table.insertRow(1);
+                console.log('row');
+                var colCount = table.rows[0].cells.length;
+                console.log('cnt');
+                console.log(colCount);
+                for (var i = 0; i < colCount; i++) {
+                    var cell = row.insertCell(i);
+                    var element = document.createElement("input");
+                    element.type = "text";
+                    element.name = "txtbox[]";
+                    element.placeholder = table.rows[0].cells[i].innerHTML;
+                    cell.appendChild(element);
+                }
+            }
+        });
+
+
+
+        function myDeleteFunction() {
+            document.getElementById("myTable").deleteRow(0);
+        }
+
+        //        document.addEventListener("WebComponentsReady", function() {
+
+        // Reference to the grid element.
+        //            var grid = document.querySelector("vaadin-grid");
+
+        // Add some example data as an array.
+        /*
+                    grid.items = [{
+                        "firstName": "Hugo",
+                        "lastName": "Romero",
+                        "email": "[email protected]"
+                    }, {
+                        "firstName": "Nieves",
+                        "lastName": "Diez",
+                        "email": "[email protected]"
+                    }, {
+                        "firstName": "Esteban",
+                        "lastName": "Vega",
+                        "email": "esteban.vega@example.com"
+                    }, {
+                        "firstName": "Roxane",
+                        "lastName": "Diez",
+                        "email": "roxane.diez@example.com"
+                    }];
+        */
+        /*
+                    grid.items = [{
+                        "pavadinimas":"Jun Technologies",
+                        "email":"WPomykala@vitae.org",
+                        "phone":"2242187899",
+                        "fname":"Bingmei",
+                        "lname":"Jokisch",
+                        "kopijuSkaicius":5
+                    },{
+                        "pavadinimas":"Jones Marketing",
+                        "email":"DDickey@lacus.gov",
+                        "phone":"9592210438",
+                        "fname":"Mallika",
+                        "lname":"Raslich",
+                        "kopijuSkaicius":7
+                    },{
+                        "pavadinimas":"Wagner Computing",
+                        "email":"ERochester@amet.org",
+                        "phone":"4727170565",
+                        "fname":"Tina",
+                        "lname":"Decoster",
+                        "kopijuSkaicius":4
+                    },{
+                        "pavadinimas":"Tadeu Global",
+                        "email":"CAlarie@sed.ly",
+                        "phone":"7982080871",
+                        "fname":"Nona",
+                        "lname":"Miranda",
+                        "kopijuSkaicius":5
+                    },{
+                        "pavadinimas":"Strong LLC",
+                        "email":"NOconnor@sapien.io",
+                        "phone":"7640314597",
+                        "fname":"Cherise",
+                        "lname":"Sam",
+                        "kopijuSkaicius":1}]
+        */
+        //        });
+    </script>
+</dom-module>
